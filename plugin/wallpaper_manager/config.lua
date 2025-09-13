@@ -1,5 +1,5 @@
 local wezterm = require('wezterm')
-local utils = require('plugin.utils')
+local utils = require('wallpaper_manager.utils')
 
 local config = {}
 

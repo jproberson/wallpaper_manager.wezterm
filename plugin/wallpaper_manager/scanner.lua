@@ -1,5 +1,5 @@
-local utils = require('plugin.utils')
-local state = require('plugin.state')
+local utils = require('wallpaper_manager.utils')
+local state = require('wallpaper_manager.state')
 
 local scanner = {}
 

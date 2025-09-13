@@ -1,9 +1,9 @@
 local wezterm = require('wezterm')
-local utils = require('plugin.utils')
-local state = require('plugin.state')
-local scanner = require('plugin.scanner')
-local background = require('plugin.background')
-local sizing = require('plugin.sizing')
+local utils = require('wallpaper_manager.utils')
+local state = require('wallpaper_manager.state')
+local scanner = require('wallpaper_manager.scanner')
+local background = require('wallpaper_manager.background')
+local sizing = require('wallpaper_manager.sizing')
 
 local actions = {}
 

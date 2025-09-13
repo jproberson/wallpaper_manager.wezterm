@@ -1,4 +1,4 @@
-local state = require('plugin.state')
+local state = require('wallpaper_manager.state')
 
 local sizing = {}
 
