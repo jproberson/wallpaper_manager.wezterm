@@ -35,9 +35,9 @@ For good text readability with background images, these are the main settings to
 
 ```lua
 local opts = {
-  opacity = 0.15,      -- lower = more subtle, higher = more visible image
-  brightness = 0.8,    -- adjust image brightness (0.0 to 1.0)
-  saturation = 1.0,    -- reduce if images are too colorful
+  image_opacity = 0.15,      -- lower = more subtle, higher = more visible image
+  image_brightness = 0.8,    -- adjust image brightness (0.0 to 1.0)
+  image_saturation = 1.0,    -- reduce if images are too colorful
 }
 ```
 
@@ -54,19 +54,24 @@ Here are all the available settings with their defaults:
 ```lua
 local opts = {
   image_directory = wezterm.config_dir .. '/images',
-  opacity = 0.15,
-  brightness = 0.8,
-  saturation = 1.0,
-  hue = 1.0,
-  horizontal_align = 'Center',      -- Left, Center, Right
-  vertical_align = 'Middle',        -- Top, Middle, Bottom  
-  attachment = 'Fixed',
-  repeat_x = 'NoRepeat',
-  repeat_y = 'NoRepeat',
-  refresh_interval = 60,            -- seconds between directory scans
-  auto_rotate_interval = 300,       -- seconds between rotations (0 = disabled)
-  rotate_mode = 'random',           -- 'random' or 'sequential'
-  background_color = nil,           -- optional solid color behind image (this will default to the standard wezterm color)
+  image_opacity = 1.0,
+  image_brightness = 1.0,
+  image_saturation = 1.0,
+  image_hue = 1.0,
+  image_width = 'Contain',
+  image_height = 'Contain',
+  image_horizontal_align = 'Center',      -- Left, Center, Right
+  image_vertical_align = 'Middle',        -- Top, Middle, Bottom  
+  image_attachment_mode = 'Fixed',
+  image_repeat_x = 'NoRepeat',
+  image_repeat_y = 'NoRepeat',
+  directory_scan_interval = 60,           -- seconds between directory scans
+  auto_rotate_interval = 300,             -- seconds between rotations (0 = disabled)
+  rotate_mode = 'random',                 -- 'random' or 'sequential'
+  background_color = nil,                 -- optional solid color behind image (this will default to the standard wezterm color)
+  background_layer_opacity = 1.0,
+  background_layer_width = '100%',
+  background_layer_height = '100%',
   available_size_modes = {'Contain', 'Cover', '75%', '100%', '125%', '150%'},
 }
 ```
