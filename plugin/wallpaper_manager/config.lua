@@ -3,8 +3,6 @@ local utils = require('wallpaper_manager.utils')
 
 local config = {}
 
-config.active_configuration = nil
-
 local function determine_default_images_directory()
     local wezterm_config_directory = wezterm.config_dir
     if wezterm_config_directory then
@@ -80,14 +78,6 @@ function config.merge_configurations(user_provided_options)
     merged_plugin_configuration.background_color = user_provided_options.background_color or config.plugin_default_configuration.background_color
     
     return merged_plugin_configuration
-end
-
-function config.set_active_configuration(merged_config)
-    config.active_configuration = merged_config
-end
-
-function config.get_active_configuration()
-    return config.active_configuration
 end
 
 return config

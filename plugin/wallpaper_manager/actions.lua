@@ -7,25 +7,15 @@ local sizing = require('wallpaper_manager.sizing')
 
 local actions = {}
 
-local function get_configuration()
-    local config = require('wallpaper_manager.config')
-    return config.get_active_configuration()
-end
 
 function actions.create_random_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local active_config = get_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
-
-        local selected_image_path = scanner.select_random_image_from_discovered_files(active_config)
+        local selected_image_path = scanner.select_random_image_from_discovered_files()
         if selected_image_path then
             utils.log_plugin_info("Random image selected: " .. selected_image_path)
             local success, error = pcall(function()
                 target_window:set_config_overrides({
-                    background = background.create_background_layers_with_image(selected_image_path, active_config)
+                    background = background.create_background_layers_with_image(selected_image_path)
                 })
             end)
             if success then
@@ -43,19 +33,13 @@ function actions.create_next_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
         utils.log_plugin_info("KEYBIND TRIGGERED: select_next_image action called")
 
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
-        local selected_image_path = scanner.select_next_image_from_discovered_files(active_config)
+        local selected_image_path = scanner.select_next_image_from_discovered_files()
         if selected_image_path then
             utils.log_plugin_info("Next image selected: " .. selected_image_path)
 
             local success, error = pcall(function()
                 target_window:set_config_overrides({
-                    background = background.create_background_layers_with_image(selected_image_path, active_config)
+                    background = background.create_background_layers_with_image(selected_image_path)
                 })
             end)
             if success then
@@ -73,19 +57,13 @@ function actions.create_previous_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
         utils.log_plugin_info("KEYBIND TRIGGERED: select_previous_image action called")
 
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
-        local selected_image_path = scanner.select_previous_image_from_discovered_files(active_config)
+        local selected_image_path = scanner.select_previous_image_from_discovered_files()
         if selected_image_path then
             utils.log_plugin_info("Previous image selected: " .. selected_image_path)
 
             local success, error = pcall(function()
                 target_window:set_config_overrides({
-                    background = background.create_background_layers_with_image(selected_image_path, active_config)
+                    background = background.create_background_layers_with_image(selected_image_path)
                 })
             end)
             if success then
@@ -101,15 +79,9 @@ end
 
 function actions.create_background_display_toggle_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
         state.plugin_state.is_background_display_enabled = not state.plugin_state.is_background_display_enabled
         if state.plugin_state.is_background_display_enabled and state.plugin_state.current_background_image_path then
-            if background.apply_current_background_image_to_window(target_window, active_config) then
+            if background.apply_current_background_image_to_window(target_window) then
                 utils.log_plugin_info("Background image enabled")
             else
                 utils.log_plugin_error("Failed to enable background image")
@@ -118,7 +90,7 @@ function actions.create_background_display_toggle_action()
         else
             local success, error_msg = pcall(function()
                 target_window:set_config_overrides({
-                    background = background.create_background_layers_without_image(active_config)
+                    background = background.create_background_layers_without_image()
                 })
             end)
             if success then
@@ -132,57 +104,33 @@ end
 
 function actions.create_image_directory_reload_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
         state.plugin_state.last_directory_scan_time = 0
-        scanner.refresh_discovered_image_files(active_config)
+        scanner.refresh_discovered_image_files()
         utils.log_plugin_info("Image list reloaded: " .. #state.plugin_state.discovered_image_files .. " images found")
     end)
 end
 
 function actions.create_image_size_increase_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
         local new_size_mode = sizing.increase_current_image_size_mode()
         utils.log_plugin_info("Image size increased to: " .. new_size_mode)
-        background.apply_current_background_image_to_window(target_window, active_config)
+        background.apply_current_background_image_to_window(target_window)
     end)
 end
 
 function actions.create_image_size_decrease_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
         local new_size_mode = sizing.decrease_current_image_size_mode()
         utils.log_plugin_info("Image size decreased to: " .. new_size_mode)
-        background.apply_current_background_image_to_window(target_window, active_config)
+        background.apply_current_background_image_to_window(target_window)
     end)
 end
 
 function actions.create_image_size_cycle_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        local config = require('wallpaper_manager.config')
-        local active_config = config.get_active_configuration()
-        if not active_config then
-            utils.log_plugin_error("No active configuration found")
-            return
-        end
         local new_size_mode = sizing.cycle_to_next_image_size_mode()
         utils.log_plugin_info("Image size cycled to: " .. new_size_mode)
-        background.apply_current_background_image_to_window(target_window, active_config)
+        background.apply_current_background_image_to_window(target_window)
     end)
 end
 

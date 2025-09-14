@@ -6,31 +6,31 @@ local background = require('wallpaper_manager.background')
 
 local rotation = {}
 
-function rotation.determine_next_rotation_image(active_configuration)
-    scanner.refresh_discovered_image_files(active_configuration)
+function rotation.determine_next_rotation_image()
+    scanner.refresh_discovered_image_files()
     if #state.plugin_state.discovered_image_files == 0 then
         return nil
     end
     
-    if active_configuration.rotate_mode == "random" then
-        return scanner.select_random_image_from_discovered_files(active_configuration)
+    if state.plugin_state.rotate_mode == "random" then
+        return scanner.select_random_image_from_discovered_files()
     else
-        return scanner.select_next_image_from_discovered_files(active_configuration)
+        return scanner.select_next_image_from_discovered_files()
     end
 end
 
-function rotation.initialize_automatic_image_rotation(active_configuration)
-    if active_configuration.auto_rotate_interval <= 0 then
+function rotation.initialize_automatic_image_rotation()
+    if state.plugin_state.auto_rotate_interval <= 0 then
         return
     end
     
     local rotation_setup_successful, setup_error = pcall(function()
-        wezterm.time.call_after(active_configuration.auto_rotate_interval, function()
+        wezterm.time.call_after(state.plugin_state.auto_rotate_interval, function()
             local current_timestamp = os.time()
-            if current_timestamp - state.plugin_state.last_auto_rotation_time >= active_configuration.auto_rotate_interval then
+            if current_timestamp - state.plugin_state.last_auto_rotation_time >= state.plugin_state.auto_rotate_interval then
                 state.plugin_state.last_auto_rotation_time = current_timestamp
                 
-                local next_rotation_image = rotation.determine_next_rotation_image(active_configuration)
+                local next_rotation_image = rotation.determine_next_rotation_image()
                 if next_rotation_image and state.plugin_state.is_background_display_enabled then
                     local wezterm_multiplexer = wezterm.mux
                     if not wezterm_multiplexer then
@@ -49,7 +49,7 @@ function rotation.initialize_automatic_image_rotation(active_configuration)
                         if gui_window then
                             local window_update_successful = pcall(function()
                                 gui_window:set_config_overrides({
-                                    background = background.create_background_layers_with_image(next_rotation_image, active_configuration)
+                                    background = background.create_background_layers_with_image(next_rotation_image)
                                 })
                             end)
                             if not window_update_successful then
@@ -61,7 +61,7 @@ function rotation.initialize_automatic_image_rotation(active_configuration)
                 end
             end
             
-            rotation.initialize_automatic_image_rotation(active_configuration)
+            rotation.initialize_automatic_image_rotation()
         end)
     end)
     

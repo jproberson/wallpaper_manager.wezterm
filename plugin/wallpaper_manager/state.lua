@@ -9,6 +9,26 @@ state.plugin_state = {
     current_size_mode_index = 1,
     last_auto_rotation_time = 0,
     rotation_timer_handle = nil,
+    image_directory = nil,
+    image_opacity = 1.0,
+    image_brightness = 1.0,
+    image_saturation = 1.0,
+    image_hue = 1.0,
+    image_width = "Contain",
+    image_height = "Contain",
+    image_horizontal_align = "Center",
+    image_vertical_align = "Middle",
+    image_attachment_mode = "Fixed",
+    image_repeat_x = "NoRepeat",
+    image_repeat_y = "NoRepeat",
+    directory_scan_interval = 60,
+    auto_rotate_interval = 300,
+    rotate_mode = "random",
+    background_color = nil,
+    background_layer_opacity = 1.0,
+    background_layer_width = "100%",
+    background_layer_height = "100%",
+    available_size_modes = {"Contain", "Cover", "75%", "100%", "125%", "150%"},
 }
 
 function state.get_current_image()
@@ -28,11 +48,9 @@ function state.is_background_enabled()
 end
 
 function state.get_current_size_mode()
-    local config = require('wallpaper_manager.config')
-    local active_config = config.get_active_configuration()
-    if active_config and active_config.available_size_modes then
+    if state.plugin_state.available_size_modes then
         local index = state.plugin_state.current_size_mode_index or 1
-        return active_config.available_size_modes[index] or "Contain"
+        return state.plugin_state.available_size_modes[index] or "Contain"
     end
     return "Contain"
 end
@@ -46,6 +64,32 @@ function state.reset_state()
     state.plugin_state.current_size_mode_index = 1
     state.plugin_state.last_auto_rotation_time = 0
     state.plugin_state.rotation_timer_handle = nil
+    state.plugin_state.image_directory = nil
+    state.plugin_state.image_opacity = 1.0
+    state.plugin_state.image_brightness = 1.0
+    state.plugin_state.image_saturation = 1.0
+    state.plugin_state.image_hue = 1.0
+    state.plugin_state.image_width = "Contain"
+    state.plugin_state.image_height = "Contain"
+    state.plugin_state.image_horizontal_align = "Center"
+    state.plugin_state.image_vertical_align = "Middle"
+    state.plugin_state.image_attachment_mode = "Fixed"
+    state.plugin_state.image_repeat_x = "NoRepeat"
+    state.plugin_state.image_repeat_y = "NoRepeat"
+    state.plugin_state.directory_scan_interval = 60
+    state.plugin_state.auto_rotate_interval = 300
+    state.plugin_state.rotate_mode = "random"
+    state.plugin_state.background_color = nil
+    state.plugin_state.background_layer_opacity = 1.0
+    state.plugin_state.background_layer_width = "100%"
+    state.plugin_state.background_layer_height = "100%"
+    state.plugin_state.available_size_modes = {"Contain", "Cover", "75%", "100%", "125%", "150%"}
+end
+
+function state.initialize_state_with_configuration(merged_configuration)
+    for config_key, config_value in pairs(merged_configuration) do
+        state.plugin_state[config_key] = config_value
+    end
 end
 
 return state

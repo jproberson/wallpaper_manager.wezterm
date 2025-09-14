@@ -55,20 +55,18 @@ function scanner.scan_directory_for_supported_image_files(target_directory)
     return discovered_image_files
 end
 
-function scanner.refresh_discovered_image_files(active_configuration)
+function scanner.refresh_discovered_image_files()
     local current_time = os.time()
-    if state.plugin_state.last_directory_scan_time == nil then
-        state.plugin_state.last_directory_scan_time = 0
-        utils.log_plugin_warning("last_directory_scan_time was nil, resetting to 0")
-    end
-    local scan_interval = active_configuration.directory_scan_interval or 60
-    if current_time - state.plugin_state.last_directory_scan_time > scan_interval then
+    local last_scan_time = state.plugin_state.last_directory_scan_time or 0
+    local scan_interval = state.plugin_state.directory_scan_interval or 60
+    
+    if current_time - last_scan_time > scan_interval then
         local previous_image_count = #state.plugin_state.discovered_image_files
-        state.plugin_state.discovered_image_files = scanner.scan_directory_for_supported_image_files(active_configuration.image_directory)
+        state.plugin_state.discovered_image_files = scanner.scan_directory_for_supported_image_files(state.plugin_state.image_directory)
         state.plugin_state.last_directory_scan_time = current_time
         
         if #state.plugin_state.discovered_image_files == 0 then
-            utils.log_plugin_warning("No images found in directory: " .. active_configuration.image_directory)
+            utils.log_plugin_warning("No images found in directory: " .. state.plugin_state.image_directory)
         elseif #state.plugin_state.discovered_image_files ~= previous_image_count then
             utils.log_plugin_info("Image list refreshed: " .. #state.plugin_state.discovered_image_files .. " images found")
         end
@@ -79,8 +77,8 @@ function scanner.refresh_discovered_image_files(active_configuration)
     end
 end
 
-function scanner.select_random_image_from_discovered_files(active_configuration)
-    scanner.refresh_discovered_image_files(active_configuration)
+function scanner.select_random_image_from_discovered_files()
+    scanner.refresh_discovered_image_files()
     if #state.plugin_state.discovered_image_files > 0 then
         math.randomseed(os.time())
         local random_index = math.random(#state.plugin_state.discovered_image_files)
@@ -92,8 +90,8 @@ function scanner.select_random_image_from_discovered_files(active_configuration)
     return nil
 end
 
-function scanner.select_next_image_from_discovered_files(active_configuration)
-    scanner.refresh_discovered_image_files(active_configuration)
+function scanner.select_next_image_from_discovered_files()
+    scanner.refresh_discovered_image_files()
     if #state.plugin_state.discovered_image_files > 0 then
         state.plugin_state.current_image_list_index = (state.plugin_state.current_image_list_index % #state.plugin_state.discovered_image_files) + 1
         state.plugin_state.current_background_image_path = state.plugin_state.discovered_image_files[state.plugin_state.current_image_list_index]
@@ -102,8 +100,8 @@ function scanner.select_next_image_from_discovered_files(active_configuration)
     return nil
 end
 
-function scanner.select_previous_image_from_discovered_files(active_configuration)
-    scanner.refresh_discovered_image_files(active_configuration)
+function scanner.select_previous_image_from_discovered_files()
+    scanner.refresh_discovered_image_files()
     if #state.plugin_state.discovered_image_files > 0 then
         state.plugin_state.current_image_list_index = state.plugin_state.current_image_list_index - 1
         if state.plugin_state.current_image_list_index < 1 then

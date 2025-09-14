@@ -23,35 +23,35 @@ function core.apply_to_config(wezterm_config, user_provided_options)
     
     local merged_plugin_configuration = config.merge_configurations(user_provided_options)
     
-    config.set_active_configuration(merged_plugin_configuration)
+    state.initialize_state_with_configuration(merged_plugin_configuration)
     
-    if not utils.verify_directory_exists_at_path(merged_plugin_configuration.image_directory) then
-        utils.log_plugin_error("Image directory does not exist: " .. merged_plugin_configuration.image_directory)
+    if not utils.verify_directory_exists_at_path(state.plugin_state.image_directory) then
+        utils.log_plugin_error("Image directory does not exist: " .. state.plugin_state.image_directory)
         return false
     end
     
     state.plugin_state.current_size_mode_index = 1
     
-    scanner.refresh_discovered_image_files(merged_plugin_configuration)
-    utils.log_plugin_info("Found " .. #state.plugin_state.discovered_image_files .. " images in " .. merged_plugin_configuration.image_directory)
+    scanner.refresh_discovered_image_files()
+    utils.log_plugin_info("Found " .. #state.plugin_state.discovered_image_files .. " images in " .. state.plugin_state.image_directory)
     
     if not state.plugin_state.current_background_image_path and #state.plugin_state.discovered_image_files > 0 then
         state.plugin_state.current_background_image_path = state.plugin_state.discovered_image_files[1]
         state.plugin_state.current_image_list_index = 1
         utils.log_plugin_info("Setting initial background to " .. state.plugin_state.current_background_image_path)
         
-        wezterm_config.background = background.create_background_layers_with_image(state.plugin_state.current_background_image_path, merged_plugin_configuration)
+        wezterm_config.background = background.create_background_layers_with_image(state.plugin_state.current_background_image_path)
     else
         if #state.plugin_state.discovered_image_files == 0 then
             utils.log_plugin_warning("No images found, using solid background")
         end
-        wezterm_config.background = background.create_background_layers_without_image(merged_plugin_configuration)
+        wezterm_config.background = background.create_background_layers_without_image()
     end
     
-    if merged_plugin_configuration.auto_rotate_interval > 0 then
+    if state.plugin_state.auto_rotate_interval > 0 then
         state.plugin_state.last_auto_rotation_time = os.time()
-        rotation.initialize_automatic_image_rotation(merged_plugin_configuration)
-        utils.log_plugin_info("Auto-rotation enabled: " .. merged_plugin_configuration.auto_rotate_interval .. "s (" .. merged_plugin_configuration.rotate_mode .. " mode)")
+        rotation.initialize_automatic_image_rotation()
+        utils.log_plugin_info("Auto-rotation enabled: " .. state.plugin_state.auto_rotate_interval .. "s (" .. state.plugin_state.rotate_mode .. " mode)")
     end
     
     utils.log_plugin_info("Plugin loaded with " .. #state.plugin_state.discovered_image_files .. " images")
