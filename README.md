@@ -1,6 +1,6 @@
 # wallpaper_manager.wezterm
 
-A small WezTerm plugin that sets and rotates background images in your terminal. It scans a folder of images, can auto-rotate on a timer, and optionally exposes actions you can bind to keys.
+A WezTerm plugin that sets and rotates background images in your terminal. It scans a folder of images, can auto-rotate on a timer, and provides actions you can bind to keys.
 
 ## Install
 
@@ -29,29 +29,53 @@ wallpaper.enable_defaults(config, opts)
 return config
 ```
 
+## Text Clarity
+
+For good text readability with background images, these are the main settings to experiment with:
+
+```lua
+local opts = {
+  opacity = 0.15,      -- lower = more subtle, higher = more visible image
+  brightness = 0.8,    -- adjust image brightness (0.0 to 1.0)
+  saturation = 1.0,    -- reduce if images are too colorful
+}
+```
+
+Start with the defaults and adjust based on your images and preferences.
+
 ## Configuration (optional)
 
-You can tweak opacity, brightness, saturation, hue, alignment, repeat, background color, and size modes.
+You can customize opacity, brightness, saturation, hue, alignment, repeat behavior, background color, and size modes.
+
+## All Configuration Options
+
+Here are all the available settings with their defaults:
+
+```lua
+local opts = {
+  image_directory = wezterm.config_dir .. '/images',
+  opacity = 0.15,
+  brightness = 0.8,
+  saturation = 1.0,
+  hue = 1.0,
+  horizontal_align = 'Center',      -- Left, Center, Right
+  vertical_align = 'Middle',        -- Top, Middle, Bottom  
+  attachment = 'Fixed',
+  repeat_x = 'NoRepeat',
+  repeat_y = 'NoRepeat',
+  refresh_interval = 60,            -- seconds between directory scans
+  auto_rotate_interval = 300,       -- seconds between rotations (0 = disabled)
+  rotate_mode = 'random',           -- 'random' or 'sequential'
+  background_color = nil,           -- optional solid color behind image (this will default to the standard wezterm color)
+  available_size_modes = {'Contain', 'Cover', '75%', '100%', '125%', '150%'},
+}
+```
 
 ## Key Bindings (optional)
 
-If you want key-based control, bind the provided actions. Example:
+These are the actions that are currently supported feel free to change the keys:
 
 ```lua
-
-local wezterm = require 'wezterm'
-local wallpaper = wezterm.plugin.require('https://github.com/jproberson/wallpaper_manager.wezterm')
-
-local config = {}
-
-local opts = {
-  image_directory = wezterm.config_dir .. '/images',
-  auto_rotate_interval = 300,
-  rotate_mode = 'random',
-}
-
-wallpaper.enable_defaults(config, opts)
-
 local wm = wallpaper.actions(opts)
 config.keys = {
   { key = ']', mods = 'ALT',        action = wm.select_next_image },
@@ -63,6 +87,4 @@ config.keys = {
   { key = '0', mods = 'ALT',        action = wm.cycle_image_size_modes },
   { key = 'R', mods = 'ALT|SHIFT',  action = wm.reload_image_directory },
 }
-
-return config
 ```
