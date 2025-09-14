@@ -6,8 +6,6 @@ state.plugin_state = {
     last_directory_scan_time = 0,
     is_background_display_enabled = true,
     current_image_list_index = 1,
-    active_image_size_mode = "Contain",
-    available_size_modes = {},
     current_size_mode_index = 1,
     last_auto_rotation_time = 0,
     rotation_timer_handle = nil,
@@ -30,7 +28,13 @@ function state.is_background_enabled()
 end
 
 function state.get_current_size_mode()
-    return state.plugin_state.active_image_size_mode
+    local config = require('wallpaper_manager.config')
+    local active_config = config.get_active_configuration()
+    if active_config and active_config.available_size_modes then
+        local index = state.plugin_state.current_size_mode_index or 1
+        return active_config.available_size_modes[index] or "Contain"
+    end
+    return "Contain"
 end
 
 function state.reset_state()
@@ -39,8 +43,6 @@ function state.reset_state()
     state.plugin_state.last_directory_scan_time = 0
     state.plugin_state.is_background_display_enabled = true
     state.plugin_state.current_image_list_index = 1
-    state.plugin_state.active_image_size_mode = "Contain"
-    state.plugin_state.available_size_modes = {}
     state.plugin_state.current_size_mode_index = 1
     state.plugin_state.last_auto_rotation_time = 0
     state.plugin_state.rotation_timer_handle = nil

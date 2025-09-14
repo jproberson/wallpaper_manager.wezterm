@@ -18,7 +18,6 @@ local function init()
     
     setup_plugin_path()
     
-    -- Export core functionality
     local core = require('wallpaper_manager.core')
     pub.apply_to_config = core.apply_to_config
     pub.enable_defaults = core.enable_defaults

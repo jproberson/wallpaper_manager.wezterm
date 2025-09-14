@@ -23,13 +23,14 @@ function core.apply_to_config(wezterm_config, user_provided_options)
     
     local merged_plugin_configuration = config.merge_configurations(user_provided_options)
     
+    config.set_active_configuration(merged_plugin_configuration)
+    
     if not utils.verify_directory_exists_at_path(merged_plugin_configuration.image_directory) then
         utils.log_plugin_error("Image directory does not exist: " .. merged_plugin_configuration.image_directory)
         return false
     end
     
-    state.plugin_state.available_size_modes = merged_plugin_configuration.available_size_modes
-    state.plugin_state.active_image_size_mode = merged_plugin_configuration.available_size_modes[1]
+    state.plugin_state.current_size_mode_index = 1
     
     scanner.refresh_discovered_image_files(merged_plugin_configuration)
     utils.log_plugin_info("Found " .. #state.plugin_state.discovered_image_files .. " images in " .. merged_plugin_configuration.image_directory)
@@ -65,8 +66,8 @@ function core.enable_defaults(wezterm_config, user_provided_options)
     return core.apply_to_config(wezterm_config, user_provided_options)
 end
 
-function core.actions(plugin_configuration)
-    return actions.get_actions(plugin_configuration)
+function core.actions()
+    return actions.get_actions()
 end
 
 function core.get_current_image()

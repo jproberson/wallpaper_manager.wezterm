@@ -57,7 +57,12 @@ end
 
 function scanner.refresh_discovered_image_files(active_configuration)
     local current_time = os.time()
-    if current_time - state.plugin_state.last_directory_scan_time > active_configuration.directory_scan_interval then
+    if state.plugin_state.last_directory_scan_time == nil then
+        state.plugin_state.last_directory_scan_time = 0
+        utils.log_plugin_warning("last_directory_scan_time was nil, resetting to 0")
+    end
+    local scan_interval = active_configuration.directory_scan_interval or 60
+    if current_time - state.plugin_state.last_directory_scan_time > scan_interval then
         local previous_image_count = #state.plugin_state.discovered_image_files
         state.plugin_state.discovered_image_files = scanner.scan_directory_for_supported_image_files(active_configuration.image_directory)
         state.plugin_state.last_directory_scan_time = current_time

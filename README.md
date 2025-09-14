@@ -1,6 +1,6 @@
 # wallpaper_manager.wezterm
 
-A WezTerm plugin that sets and rotates background images in your terminal. It scans a folder of images, can auto-rotate on a timer, and provides actions you can bind to keys.
+A WezTerm plugin for cycling terminal background images. Scans image folders, auto-switches on timers, and provides keyboard shortcuts for manual image selection.
 
 ## Install
 
