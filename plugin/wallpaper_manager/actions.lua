@@ -134,6 +134,13 @@ function actions.create_image_size_cycle_action()
     end)
 end
 
+function actions.create_config_refresh_action()
+    return wezterm.action_callback(function(target_window, target_pane)
+        background.refresh_all_windows_with_current_state()
+        utils.log_plugin_info("Manually refreshed all windows with current config")
+    end)
+end
+
 function actions.get_actions()
     return {
         select_random_image = actions.create_random_image_selection_action(),
@@ -143,7 +150,8 @@ function actions.get_actions()
         reload_image_directory = actions.create_image_directory_reload_action(),
         increase_image_size = actions.create_image_size_increase_action(),
         decrease_image_size = actions.create_image_size_decrease_action(),
-        cycle_image_size_modes = actions.create_image_size_cycle_action()
+        cycle_image_size_modes = actions.create_image_size_cycle_action(),
+        refresh_config = actions.create_config_refresh_action()
     }
 end
 

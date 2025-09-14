@@ -77,4 +77,31 @@ function background.apply_current_background_image_to_window(target_window)
     end
 end
 
+function background.refresh_all_windows_with_current_state()
+    local wezterm = require('wezterm')
+    if not wezterm.mux then
+        return false
+    end
+    
+    local windows_retrieval_successful, available_windows = pcall(wezterm.mux.all_windows, wezterm.mux)
+    if not windows_retrieval_successful or not available_windows then
+        return false
+    end
+    
+    for _, window_instance in ipairs(available_windows) do
+        local gui_window = window_instance:gui_window()
+        if gui_window and state.plugin_state.current_background_image_path then
+            local window_update_successful = pcall(function()
+                gui_window:set_config_overrides({
+                    background = background.create_background_layers_with_image(state.plugin_state.current_background_image_path)
+                })
+            end)
+            if window_update_successful then
+                utils.log_plugin_info("Refreshed window with updated config values")
+            end
+        end
+    end
+    return true
+end
+
 return background

@@ -25,6 +25,8 @@ function core.apply_to_config(wezterm_config, user_provided_options)
     
     state.initialize_state_with_configuration(merged_plugin_configuration)
     
+    background.refresh_all_windows_with_current_state()
+    
     if not utils.verify_directory_exists_at_path(state.plugin_state.image_directory) then
         utils.log_plugin_error("Image directory does not exist: " .. state.plugin_state.image_directory)
         return false
