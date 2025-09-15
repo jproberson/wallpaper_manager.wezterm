@@ -2,6 +2,10 @@
 
 A WezTerm plugin for cycling terminal background images. Scans image folders, auto-switches on timers, and provides keyboard shortcuts for manual image selection.
 
+I wanted to see random funny photos of my dog while working. Now every time I open my terminal, I get a little dose of joy.
+
+<img width="1463" height="811" alt="Screenshot 2025-09-15 at 11 40 37 AM" src="https://github.com/user-attachments/assets/ada1e9de-f649-4238-b3ca-00bfbf4e82e7" />
+
 ## Install
 
 - Using the plugin manager:
