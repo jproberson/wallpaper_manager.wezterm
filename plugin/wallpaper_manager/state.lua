@@ -1,5 +1,8 @@
 local state = {}
 
+local wezterm = require('wezterm')
+local utils = require('wallpaper_manager.utils')
+
 state.plugin_state = {
     current_background_image_path = nil,
     discovered_image_files = {},
@@ -8,14 +11,11 @@ state.plugin_state = {
     current_image_list_index = 1,
     current_size_mode_index = 1,
     last_auto_rotation_time = 0,
-    rotation_timer_handle = nil,
     image_directory = nil,
     image_opacity = 1.0,
     image_brightness = 1.0,
     image_saturation = 1.0,
     image_hue = 1.0,
-    image_width = "Contain",
-    image_height = "Contain",
     image_horizontal_align = "Center",
     image_vertical_align = "Middle",
     image_attachment_mode = "Fixed",
@@ -55,41 +55,60 @@ function state.get_current_size_mode()
     return "Contain"
 end
 
-function state.reset_state()
-    state.plugin_state.current_background_image_path = nil
-    state.plugin_state.discovered_image_files = {}
-    state.plugin_state.last_directory_scan_time = 0
-    state.plugin_state.is_background_display_enabled = true
-    state.plugin_state.current_image_list_index = 1
-    state.plugin_state.current_size_mode_index = 1
-    state.plugin_state.last_auto_rotation_time = 0
-    state.plugin_state.rotation_timer_handle = nil
-    state.plugin_state.image_directory = nil
-    state.plugin_state.image_opacity = 1.0
-    state.plugin_state.image_brightness = 1.0
-    state.plugin_state.image_saturation = 1.0
-    state.plugin_state.image_hue = 1.0
-    state.plugin_state.image_width = "Contain"
-    state.plugin_state.image_height = "Contain"
-    state.plugin_state.image_horizontal_align = "Center"
-    state.plugin_state.image_vertical_align = "Middle"
-    state.plugin_state.image_attachment_mode = "Fixed"
-    state.plugin_state.image_repeat_x = "NoRepeat"
-    state.plugin_state.image_repeat_y = "NoRepeat"
-    state.plugin_state.directory_scan_interval = 60
-    state.plugin_state.auto_rotate_interval = 300
-    state.plugin_state.rotate_mode = "random"
-    state.plugin_state.background_color = nil
-    state.plugin_state.background_layer_opacity = 1.0
-    state.plugin_state.background_layer_width = "100%"
-    state.plugin_state.background_layer_height = "100%"
-    state.plugin_state.available_size_modes = {"Contain", "Cover", "75%", "100%", "125%", "150%"}
+function state.initialize_state_with_configuration(merged_configuration)
+    local runtime_properties = {
+        "current_background_image_path",
+        "discovered_image_files", 
+        "last_directory_scan_time",
+        "is_background_display_enabled",
+        "current_image_list_index",
+        "current_size_mode_index", 
+        "last_auto_rotation_time"
+    }
+    
+    local persistent_data = wezterm.GLOBAL.wallpaper_manager_state
+    if persistent_data then
+        for _, prop in ipairs(runtime_properties) do
+            local value = persistent_data[prop]
+            if value ~= nil then
+                state.plugin_state[prop] = value
+            end
+        end
+    end
+    
+    for config_key, config_value in pairs(merged_configuration) do
+        local is_runtime_property = false
+        for _, runtime_prop in ipairs(runtime_properties) do
+            if config_key == runtime_prop then
+                is_runtime_property = true
+                break
+            end
+        end
+        
+        if not is_runtime_property then
+            state.plugin_state[config_key] = config_value
+        end
+    end
+    
+    state.save_persistent_state()
 end
 
-function state.initialize_state_with_configuration(merged_configuration)
-    for config_key, config_value in pairs(merged_configuration) do
-        state.plugin_state[config_key] = config_value
+function state.save_persistent_state()
+    local runtime_properties = {
+        "current_background_image_path",
+        "discovered_image_files", 
+        "last_directory_scan_time",
+        "is_background_display_enabled",
+        "current_image_list_index",
+        "current_size_mode_index", 
+        "last_auto_rotation_time"
+    }
+    
+    wezterm.GLOBAL.wallpaper_manager_state = wezterm.GLOBAL.wallpaper_manager_state or {}
+    for _, prop in ipairs(runtime_properties) do
+        wezterm.GLOBAL.wallpaper_manager_state[prop] = state.plugin_state[prop]
     end
+    
 end
 
 return state

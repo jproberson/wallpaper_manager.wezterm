@@ -5,16 +5,6 @@ local utils = {}
 utils.is_windows_platform = wezterm.target_triple:find("windows") ~= nil
 utils.directory_separator = utils.is_windows_platform and "\\" or "/"
 
-function utils.safely_require_module(module_name)
-    local success, result = pcall(require, module_name)
-    if success then
-        return result
-    else
-        wezterm.log_error("Failed to require " .. module_name .. ": " .. result)
-        return nil
-    end
-end
-
 function utils.log_plugin_error(message)
     wezterm.log_error("[image-handler] " .. message)
 end
@@ -60,20 +50,6 @@ function utils.verify_directory_exists_at_path(directory_path)
     local command_output = command_handle:read("*a")
     command_handle:close()
     return command_output and command_output:match("exists")
-end
-
-function utils.extract_file_extension_from_path(file_path)
-    return file_path:match("^.+(%..+)$"):sub(2):lower()
-end
-
-function utils.is_file_extension_supported(file_path, supported_extensions)
-    local file_extension = utils.extract_file_extension_from_path(file_path)
-    for _, supported_extension in ipairs(supported_extensions) do
-        if file_extension == supported_extension then
-            return true
-        end
-    end
-    return false
 end
 
 return utils

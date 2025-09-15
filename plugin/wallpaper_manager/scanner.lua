@@ -5,6 +5,8 @@ local scanner = {}
 
 local SUPPORTED_IMAGE_FORMATS = { "png", "jpg", "jpeg", "gif", "bmp", "ico", "tiff", "pnm", "dds", "tga" }
 
+math.randomseed(os.time())
+
 function scanner.scan_directory_for_supported_image_files(target_directory)
     local discovered_image_files = {}
     
@@ -38,7 +40,7 @@ function scanner.scan_directory_for_supported_image_files(target_directory)
         return discovered_image_files
     end
     
-    local file_processing_successful, processing_result = pcall(function()
+    local file_processing_successful = pcall(function()
         for discovered_file_path in command_handle:lines() do
             if discovered_file_path and discovered_file_path ~= "" and utils.verify_file_exists_at_path(discovered_file_path) then
                 table.insert(discovered_image_files, discovered_file_path)
@@ -80,10 +82,19 @@ end
 function scanner.select_random_image_from_discovered_files()
     scanner.refresh_discovered_image_files()
     if #state.plugin_state.discovered_image_files > 0 then
-        math.randomseed(os.time())
-        local random_index = math.random(#state.plugin_state.discovered_image_files)
+        local random_index
+        if #state.plugin_state.discovered_image_files == 1 then
+            random_index = 1
+        else
+            local current_index = state.plugin_state.current_image_list_index or 1
+            repeat
+                random_index = math.random(#state.plugin_state.discovered_image_files)
+            until random_index ~= current_index
+        end
+        
         state.plugin_state.current_image_list_index = random_index
         state.plugin_state.current_background_image_path = state.plugin_state.discovered_image_files[random_index]
+        state.save_persistent_state()
         return state.plugin_state.current_background_image_path
     end
     utils.log_plugin_warning("No images available for random selection")
@@ -95,6 +106,7 @@ function scanner.select_next_image_from_discovered_files()
     if #state.plugin_state.discovered_image_files > 0 then
         state.plugin_state.current_image_list_index = (state.plugin_state.current_image_list_index % #state.plugin_state.discovered_image_files) + 1
         state.plugin_state.current_background_image_path = state.plugin_state.discovered_image_files[state.plugin_state.current_image_list_index]
+        state.save_persistent_state()
         return state.plugin_state.current_background_image_path
     end
     return nil
@@ -108,6 +120,7 @@ function scanner.select_previous_image_from_discovered_files()
             state.plugin_state.current_image_list_index = #state.plugin_state.discovered_image_files
         end
         state.plugin_state.current_background_image_path = state.plugin_state.discovered_image_files[state.plugin_state.current_image_list_index]
+        state.save_persistent_state()
         return state.plugin_state.current_background_image_path
     end
     return nil

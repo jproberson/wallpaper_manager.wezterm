@@ -12,67 +12,49 @@ function actions.create_random_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
         local selected_image_path = scanner.select_random_image_from_discovered_files()
         if selected_image_path then
-            utils.log_plugin_info("Random image selected: " .. selected_image_path)
             local success, error = pcall(function()
                 target_window:set_config_overrides({
                     background = background.create_background_layers_with_image(selected_image_path)
                 })
+                state.save_persistent_state()
             end)
-            if success then
-                utils.log_plugin_info("Successfully set random background image via keybind")
-            else
+            if not success then
                 utils.log_plugin_error("Failed to set random background image: " .. tostring(error))
             end
-        else
-            utils.log_plugin_warning("No images available for random selection")
         end
     end)
 end
 
 function actions.create_next_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        utils.log_plugin_info("KEYBIND TRIGGERED: select_next_image action called")
-
         local selected_image_path = scanner.select_next_image_from_discovered_files()
         if selected_image_path then
-            utils.log_plugin_info("Next image selected: " .. selected_image_path)
-
             local success, error = pcall(function()
                 target_window:set_config_overrides({
                     background = background.create_background_layers_with_image(selected_image_path)
                 })
+                state.save_persistent_state()
             end)
-            if success then
-                utils.log_plugin_info("Successfully set next background image via keybind")
-            else
+            if not success then
                 utils.log_plugin_error("Failed to set next background image: " .. tostring(error))
             end
-        else
-            utils.log_plugin_warning("No images available for next selection")
         end
     end)
 end
 
 function actions.create_previous_image_selection_action()
     return wezterm.action_callback(function(target_window, target_pane)
-        utils.log_plugin_info("KEYBIND TRIGGERED: select_previous_image action called")
-
         local selected_image_path = scanner.select_previous_image_from_discovered_files()
         if selected_image_path then
-            utils.log_plugin_info("Previous image selected: " .. selected_image_path)
-
             local success, error = pcall(function()
                 target_window:set_config_overrides({
                     background = background.create_background_layers_with_image(selected_image_path)
                 })
+                state.save_persistent_state()
             end)
-            if success then
-                utils.log_plugin_info("Successfully set previous background image via keybind")
-            else
+            if not success then
                 utils.log_plugin_error("Failed to set previous background image: " .. tostring(error))
             end
-        else
-            utils.log_plugin_warning("No images available for previous selection")
         end
     end)
 end
@@ -134,13 +116,6 @@ function actions.create_image_size_cycle_action()
     end)
 end
 
-function actions.create_config_refresh_action()
-    return wezterm.action_callback(function(target_window, target_pane)
-        background.refresh_all_windows_with_current_state()
-        utils.log_plugin_info("Manually refreshed all windows with current config")
-    end)
-end
-
 function actions.get_actions()
     return {
         select_random_image = actions.create_random_image_selection_action(),
@@ -150,8 +125,7 @@ function actions.get_actions()
         reload_image_directory = actions.create_image_directory_reload_action(),
         increase_image_size = actions.create_image_size_increase_action(),
         decrease_image_size = actions.create_image_size_decrease_action(),
-        cycle_image_size_modes = actions.create_image_size_cycle_action(),
-        refresh_config = actions.create_config_refresh_action()
+        cycle_image_size_modes = actions.create_image_size_cycle_action()
     }
 end
 

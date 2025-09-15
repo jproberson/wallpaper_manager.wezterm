@@ -1,3 +1,4 @@
+local wezterm = require('wezterm')
 local utils = require('wallpaper_manager.utils')
 local state = require('wallpaper_manager.state')
 
@@ -26,7 +27,6 @@ function background.create_wezterm_background_layer_configuration(image_file_pat
 end
 
 function background.create_background_layers_with_image(image_path)
-    local wezterm = require('wezterm')
     local layers = {}
     
     local bg_color = state.plugin_state.background_color or "#000000"
@@ -78,7 +78,6 @@ function background.apply_current_background_image_to_window(target_window)
 end
 
 function background.refresh_all_windows_with_current_state()
-    local wezterm = require('wezterm')
     if not wezterm.mux then
         return false
     end
@@ -90,15 +89,16 @@ function background.refresh_all_windows_with_current_state()
     
     for _, window_instance in ipairs(available_windows) do
         local gui_window = window_instance:gui_window()
-        if gui_window and state.plugin_state.current_background_image_path then
+        if gui_window then
             local window_update_successful = pcall(function()
-                gui_window:set_config_overrides({
-                    background = background.create_background_layers_with_image(state.plugin_state.current_background_image_path)
-                })
+                if state.plugin_state.current_background_image_path then
+                    gui_window:set_config_overrides({
+                        background = background.create_background_layers_with_image(state.plugin_state.current_background_image_path)
+                    })
+                else
+                    gui_window:set_config_overrides({})
+                end
             end)
-            if window_update_successful then
-                utils.log_plugin_info("Refreshed window with updated config values")
-            end
         end
     end
     return true

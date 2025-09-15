@@ -32,13 +32,12 @@ function rotation.initialize_automatic_image_rotation()
                 
                 local next_rotation_image = rotation.determine_next_rotation_image()
                 if next_rotation_image and state.plugin_state.is_background_display_enabled then
-                    local wezterm_multiplexer = wezterm.mux
-                    if not wezterm_multiplexer then
+                    if not wezterm.mux then
                         utils.log_plugin_error("Mux not available for auto-rotation")
                         return
                     end
                     
-                    local windows_retrieval_successful, available_windows = pcall(wezterm_multiplexer.all_windows, wezterm_multiplexer)
+                    local windows_retrieval_successful, available_windows = pcall(wezterm.mux.all_windows, wezterm.mux)
                     if not windows_retrieval_successful or not available_windows then
                         utils.log_plugin_error("Failed to get windows for auto-rotation")
                         return
@@ -58,6 +57,7 @@ function rotation.initialize_automatic_image_rotation()
                         end
                     end
                     utils.log_plugin_info("Auto-rotated to image: " .. next_rotation_image)
+                    state.save_persistent_state()
                 end
             end
             
